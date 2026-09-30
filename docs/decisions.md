@@ -11,3 +11,13 @@
 **Tradeoff:** We may omit a legitimately earlier same-day result.
 
 **Verification:** Test that a match's features exclude its own result, all later results, and every result dated the same day.
+
+## 2026-09-30 - Split by season
+
+**Evidence:** The database contains eight consecutive seasons from 2008/2009 to 2015/2016, with 3,032 to 3,326 matches per season.
+
+**Decision:** Train on 2008/2009 through 2013/2014 (19,328 matches), validate on 2014/2015 (3,325), and use 2015/2016 as the final test (3,326). Do not shuffle matches across these periods.
+
+**Reason:** Validation and testing should measure predictions for seasons later than the training data. Choose features and model settings using validation; reserve the test season for the final evaluation.
+
+**Feature timing:** For a match on date D, use results dated strictly before D, including previously observed results during validation or test when making sequential pre-match predictions. Fit learned preprocessing only on training data.
