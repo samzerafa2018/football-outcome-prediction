@@ -2,13 +2,13 @@
 
 ## Protocol
 
-Predict pre-match H/D/A probabilities using league and team IDs, plus each team's match count and points per match over its most recent results. Results dated on or after a match's calendar date are excluded from its features.
+Predict pre-match H/D/A probabilities across three expanding-season folds, validating on 2012/2013, 2013/2014, and 2014/2015. For a match on date D, form uses results dated strictly before D. Earlier validation results may inform features for later validation dates; the fitted model stays fixed within each fold.
 
-Three expanding-season folds validate on 2012/2013, 2013/2014, and 2014/2015. Each fold fits a new `DictVectorizer`, `MaxAbsScaler`, and logistic regression using earlier seasons only. Earlier validation results may inform features for later dates in that season; the fitted pipeline stays fixed.
+Each fold fits a new `DictVectorizer`, `MaxAbsScaler`, and regularized logistic regression on earlier seasons only. League and team IDs are categorical. Match counts, points per match, and (in the current model) goal difference per match are numeric.
 
-## Model selection
+## Points-only model selection
 
-The selection criterion is equal-weight mean validation log loss. We first compared `C` values at window 5, compared windows at `C=0.1`, then checked nearby combinations for windows 20 and 40. This table records every combination evaluated, including rejected settings.
+The selection criterion was equal-weight mean validation log loss. We compared `C` values with a five-match form window, compared windows at `C=0.1`, then checked nearby combinations. Every row below used **points and match counts without goal difference**.
 
 | Form window | C | 2012/2013 | 2013/2014 | 2014/2015 | Mean log loss |
 |---:|---:|---:|---:|---:|---:|
@@ -27,25 +27,38 @@ The selection criterion is equal-weight mean validation log loss. We first compa
 | 40 | 0.1 | 1.0190 | 0.9946 | 1.0032 | 1.0056 |
 | 80 | 0.1 | 1.0200 | 0.9998 | 1.0035 | 1.0078 |
 
-Window 40 and `C=0.03` have the lowest mean log loss among the evaluated settings. The difference from nearby candidates is small; these validation results were used for selection and are not an independent final estimate.
+Window 40 and `C=0.03` had the lowest mean log loss among those points-only settings.
 
-## Selected model results
+## Goal-difference feature comparison
+
+We then added each team's prior 40-match goal difference per match, keeping window 40, `C=0.03`, and all validation folds fixed. This isolates the effect of the new features.
+
+| Validation season | Points only log loss | With goal difference log loss |
+|---|---:|---:|
+| 2012/2013 | 1.0163 | **1.0118** |
+| 2013/2014 | 0.9934 | **0.9892** |
+| 2014/2015 | 1.0024 | **0.9982** |
+| **Equal-weight fold mean** | **1.0040** | **0.9997** |
+
+Goal difference improves log loss in all three folds. The gain is modest, so this is evidence for keeping the feature, not a claim that its effect is precisely known.
+
+## Current model results
 
 | Validation season | Matches | Accuracy | Log loss | Three-class Brier |
 |---|---:|---:|---:|---:|
-| 2012/2013 | 3,260 | 0.4948 | 1.0163 | 0.6084 |
-| 2013/2014 | 3,032 | 0.5208 | 0.9934 | 0.5923 |
-| 2014/2015 | 3,325 | 0.5119 | 1.0024 | 0.5987 |
-| **Equal-weight fold mean** | | **0.5091** | **1.0040** | **0.5998** |
+| 2012/2013 | 3,260 | 0.4997 | 1.0118 | 0.6053 |
+| 2013/2014 | 3,032 | 0.5234 | 0.9892 | 0.5895 |
+| 2014/2015 | 3,325 | 0.5146 | 0.9982 | 0.5959 |
+| **Equal-weight fold mean** | | **0.5126** | **0.9997** | **0.5969** |
 
-| Equal-weight mean | Training-prior baseline | Selected logistic model |
-|---|---:|---:|
-| Accuracy | 0.4518 | **0.5091** |
-| Log loss | 1.0676 | **1.0040** |
-| Three-class Brier | 0.6452 | **0.5998** |
+| Equal-weight mean | Training-prior baseline | Points-only model | Current model |
+|---|---:|---:|---:|
+| Accuracy | 0.4518 | 0.5091 | **0.5126** |
+| Log loss | 1.0676 | 1.0040 | **0.9997** |
+| Three-class Brier | 0.6452 | 0.5998 | **0.5969** |
 
-The selected model improves log loss over the prior baseline in all three validation seasons. The 2015/2016 season remains reserved for the final independent evaluation.
+These validation folds were used for model and feature selection, so their scores are not an independent final estimate. The 2015/2016 season remains reserved for final testing.
 
 ## Reproduce
 
-With the database at `Data/database.sqlite/database.sqlite`, run `.\.venv\Scripts\python.exe -m footballml.evaluate_logistic` from the project root for the selected model's scores.
+With the database at `Data/database.sqlite/database.sqlite`, run `.\.venv\Scripts\python.exe -m footballml.evaluate_logistic` from the project root for the current model's scores. The points-only version and its report are preserved in Git history.

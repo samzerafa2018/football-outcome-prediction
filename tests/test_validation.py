@@ -9,7 +9,7 @@ def example(match_id: int, season: str) -> Example:
         match_id=match_id,
         match_date=date(int(season[:4]), 8, 1),
         season=season,
-        inputs=ModelInputs(1, 10, 20, 0, 0, 0.0, 0.0),
+        inputs=ModelInputs(1, 10, 20, 0, 0, 0.0, 0.0, 0.0, 0.0),
         target="H",
     )
 

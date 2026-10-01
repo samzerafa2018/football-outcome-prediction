@@ -14,6 +14,8 @@ class ModelInputs:
     away_matches: int
     home_points_per_match: float
     away_points_per_match: float
+    home_goal_difference_per_match: float
+    away_goal_difference_per_match: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +57,8 @@ def build_examples(
                     away_matches=form.away_matches,
                     home_points_per_match=form.home_points_per_match,
                     away_points_per_match=form.away_points_per_match,
+                    home_goal_difference_per_match=form.home_goal_difference_per_match,
+                    away_goal_difference_per_match=form.away_goal_difference_per_match,
                 ),
                 target=outcome_for(match),
             )

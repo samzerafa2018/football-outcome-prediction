@@ -21,6 +21,8 @@ def test_same_day_results_are_not_used_as_history() -> None:
     assert features[2].home_points_per_match == 0.0
     assert features[3].home_matches == 2
     assert features[3].home_points_per_match == 1.5
+    assert features[2].home_goal_difference_per_match == 0.0
+    assert features[3].home_goal_difference_per_match == 1.0
 
 
 def test_window_uses_recent_results_from_home_and_away_games() -> None:
@@ -35,6 +37,7 @@ def test_window_uses_recent_results_from_home_and_away_games() -> None:
     assert features[2].away_points_per_match == 3.0
     assert features[4].home_matches == 2
     assert features[4].home_points_per_match == 0.5
+    assert features[4].home_goal_difference_per_match == -1.0
 
 
 def test_current_result_cannot_change_its_own_features() -> None:

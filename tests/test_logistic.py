@@ -15,7 +15,7 @@ def _example(
         match_id=match_id,
         match_date=date(2010, 8, 1),
         season="2010/2011",
-        inputs=ModelInputs(1, home_team_id, away_team_id, 5, 5, 1.5, 1.0),
+        inputs=ModelInputs(1, home_team_id, away_team_id, 5, 5, 1.5, 1.0, 0.0, 0.0),
         target=target,
     )
 

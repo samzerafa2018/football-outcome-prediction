@@ -25,6 +25,8 @@ def _records(examples: Sequence[Example]) -> list[dict[str, str | int | float]]:
                 "away_matches": inputs.away_matches,
                 "home_points_per_match": inputs.home_points_per_match,
                 "away_points_per_match": inputs.away_points_per_match,
+                "home_goal_difference_per_match": inputs.home_goal_difference_per_match,
+                "away_goal_difference_per_match": inputs.away_goal_difference_per_match,
             }
         )
     return records

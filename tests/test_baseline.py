@@ -13,7 +13,7 @@ def example(match_id: int, target: Outcome) -> Example:
         match_id=match_id,
         match_date=date(2010, 8, 1),
         season="2010/2011",
-        inputs=ModelInputs(1, 10, 20, 0, 0, 0.0, 0.0),
+        inputs=ModelInputs(1, 10, 20, 0, 0, 0.0, 0.0, 0.0, 0.0),
         target=target,
     )
 
