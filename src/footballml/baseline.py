@@ -3,13 +3,9 @@ from collections.abc import Mapping, Sequence
 from math import log
 from pathlib import Path
 
-from footballml.data import (
-    TRAIN_SEASONS,
-    VALIDATION_SEASON,
-    Outcome,
-    load_matches,
-)
+from footballml.data import Outcome, load_matches
 from footballml.dataset import Example, build_examples
+from footballml.validation import rolling_validation_folds
 
 OUTCOMES: tuple[Outcome, Outcome, Outcome] = ("H", "D", "A")
 
@@ -51,16 +47,24 @@ def evaluate_prior(
 
 def main() -> None:
     matches = load_matches(Path("Data/database.sqlite/database.sqlite"))
-    examples = build_examples(matches)
-    train = [row for row in examples if row.season in TRAIN_SEASONS]
-    validation = [row for row in examples if row.season == VALIDATION_SEASON]
+    folds = rolling_validation_folds(build_examples(matches))
+    results: list[tuple[float, float, float]] = []
 
-    probabilities = fit_prior(train)
-    accuracy, log_loss, brier = evaluate_prior(validation, probabilities)
-    print("Training probabilities H/D/A:", probabilities)
-    print(f"Validation accuracy: {accuracy:.4f}")
-    print(f"Validation log loss: {log_loss:.4f}")
-    print(f"Validation three-class Brier score: {brier:.4f}")
+    for fold in folds:
+        probabilities = fit_prior(fold.train)
+        accuracy, log_loss, brier = evaluate_prior(fold.validation, probabilities)
+        results.append((accuracy, log_loss, brier))
+        print(
+            f"{fold.validation_season}: "
+            f"accuracy={accuracy:.4f}, "
+            f"log_loss={log_loss:.4f}, "
+            f"brier={brier:.4f}"
+        )
+
+    count = len(results)
+    print(f"Mean validation accuracy: {sum(r[0] for r in results) / count:.4f}")
+    print(f"Mean validation log loss: {sum(r[1] for r in results) / count:.4f}")
+    print(f"Mean validation Brier score: {sum(r[2] for r in results) / count:.4f}")
 
 
 if __name__ == "__main__":
