@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from footballml.data import Match, Outcome, outcome_for
-from footballml.features import build_form_features
+from footballml.features import DEFAULT_FORM_WINDOW, build_form_features
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,7 +25,9 @@ class Example:
     target: Outcome
 
 
-def build_examples(matches: list[Match], window: int = 5) -> list[Example]:
+def build_examples(
+    matches: list[Match], window: int = DEFAULT_FORM_WINDOW
+) -> list[Example]:
     """Build sequential pre-match examples from the complete match history."""
     ordered = sorted(matches, key=lambda m: (m.match_date, m.match_id))
     match_ids = {match.match_id for match in ordered}

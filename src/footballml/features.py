@@ -4,6 +4,8 @@ from itertools import groupby
 
 from footballml.data import Match
 
+DEFAULT_FORM_WINDOW = 40
+
 
 @dataclass(frozen=True, slots=True)
 class FormFeatures:
@@ -26,7 +28,9 @@ def _average(points: deque[int]) -> float:
     return sum(points) / len(points) if points else 0.0
 
 
-def build_form_features(matches: list[Match], window: int = 5) -> list[FormFeatures]:
+def build_form_features(
+    matches: list[Match], window: int = DEFAULT_FORM_WINDOW
+) -> list[FormFeatures]:
     """Use only results from dates strictly before each match."""
     if window < 1:
         raise ValueError("window must be at least 1")
