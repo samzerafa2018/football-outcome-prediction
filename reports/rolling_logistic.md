@@ -58,7 +58,31 @@ Goal difference improves log loss in all three folds. The gain is modest, so thi
 | Three-class Brier | 0.6452 | 0.5998 | **0.5969** |
 
 These validation folds were used for model and feature selection, so their scores are not an independent final estimate. The 2015/2016 season remains reserved for final testing.
+## Calibration check
+
+Across the three validation seasons, average predicted outcome rates were close to observed rates. Five equal-sized probability groups per outcome showed some underconfidence for high home- and away-win probabilities.
+
+| Temperature | 2012/2013 | 2013/2014 | 2014/2015 | Mean log loss |
+|---:|---:|---:|---:|---:|
+| 0.8 | 1.0164 | 0.9882 | 1.0010 | 1.0018 |
+| 0.9 | 1.0127 | 0.9876 | 0.9982 | 0.9995 |
+| **1.0 (unchanged)** | **1.0118** | **0.9892** | **0.9982** | **0.9997** |
+| 1.1 | 1.0125 | 0.9920 | 0.9997 | 1.0014 |
+
+The 0.0002 mean improvement at temperature 0.9 is negligible and does not hold in every season. Keep the unadjusted probabilities. These are model-selection results; the 2015/2016 test season was not used.
+
+## Final held-out evaluation
+
+After selecting the features and settings using validation seasons, refit on all seven earlier seasons (22,653 matches) and evaluate on 2015/2016 (3,326 matches). The selected model uses a 40-match form window, points and goal difference, `C=0.03`, and no temperature adjustment.
+
+| Model | Accuracy | Log loss | Three-class Brier |
+|---|---:|---:|---:|
+| Training-prior baseline | 0.4387 | 1.0740 | 0.6498 |
+| Selected logistic model | **0.5024** | **1.0046** | **0.6006** |
+
+The logistic model improves accuracy by 6.37 percentage points and reduces log loss by 0.0694. Both models were fitted using only pre-test seasons. For sequential predictions, results from earlier test dates may inform later pre-match form features; test labels are never used to fit the model or preprocessing. No model setting was changed after seeing this test result.
 
 ## Reproduce
 
 With the database at `Data/database.sqlite/database.sqlite`, run `.\.venv\Scripts\python.exe -m footballml.evaluate_logistic` from the project root for the current model's scores. The points-only version and its report are preserved in Git history.
+For the held-out result, run `.\.venv\Scripts\python.exe -m footballml.evaluate_final`.
