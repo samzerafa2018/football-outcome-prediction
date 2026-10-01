@@ -30,7 +30,7 @@ def _records(examples: Sequence[Example]) -> list[dict[str, str | int | float]]:
     return records
 
 
-def fit_model(train: Sequence[Example], *, c: float = 1.0) -> Pipeline:
+def fit_model(train: Sequence[Example], *, c: float = 0.1) -> Pipeline:
     """Fit the encoder, scaler, and classifier on training matches only."""
     if not train or {row.target for row in train} != set(OUTCOMES):
         raise ValueError("Training data must contain all three outcomes")
