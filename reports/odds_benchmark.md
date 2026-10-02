@@ -24,3 +24,4 @@ From the project root, with the SQLite data at `Data/database.sqlite/database.sq
 
 ```powershell
 .\.venv\Scripts\python.exe -m footballml.evaluate_odds
+```
