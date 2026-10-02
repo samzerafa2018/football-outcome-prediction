@@ -4,7 +4,7 @@ Predict pre-match probabilities for a home win, draw, or away win using historic
 
 ## Results
 
-The selected model was evaluated on the held-out 2015/2016 season after model choices were fixed.
+The selected model was evaluated retrospectively on the 2015/2016 season. Because test results were inspected during development, these scores are not a fresh independent estimate of future performance.
 
 | Model | Accuracy | Log loss ↓ | Three-class Brier ↓ |
 |---|---:|---:|---:|
@@ -14,6 +14,8 @@ The selected model was evaluated on the held-out 2015/2016 season after model ch
 Both models were fitted on the 22,653 matches from earlier seasons and evaluated on 3,326 test matches. The logistic model's equal-weight mean log loss across three earlier validation seasons was 0.9997. Validation guided model selection; the held-out season was used for final evaluation.
 
 See [the logistic model report](reports/rolling_logistic.md) for the evaluated settings, rejected alternatives, calibration check, and final result. The [baseline report](reports/rolling_baseline.md) records the comparison across validation seasons.
+
+The [uncertainty report](reports/uncertainty.md) gives paired intervals for the held-out log-loss comparisons.
 
 ### Historical bookmaker comparison
 
@@ -70,3 +72,27 @@ The command-line interface uses exact team names and match IDs. It retrieves rec
 `build-forecasts` fits the selected logistic model on seasons through 2014/2015 and saves 3,326 held-out predictions under `Data/`, which is excluded from Git. If two teams met more than once, select a match ID before viewing its forecast. These are historical 2015/2016 predictions, not forecasts for current matches.
 
 `league-performance` ranks leagues by the mean points per recorded match of their top quarter of teams, rounded up. In 2015/2016 Portugal ranks first on this measure at 2.112. This measures domestic points concentration; it cannot establish which league has the strongest teams.
+
+## Local app
+
+The light-themed Streamlit app lets you retrieve recorded results from any season, compare the historical performance of leagues, and view the saved 2015/2016 pre-match forecasts. Its **Predict a matchup** page fits the selected model once on all 25,979 matches, then estimates a hypothetical next match using each team's latest recorded form and an assumed league. The fitted model is cached while the app runs. Those exploratory estimates use information through 2016 and are not live forecasts or an independent test result.
+
+The prediction views show all three outcome probabilities on a 0–100% chart. The league view charts the top-quarter points-per-match measure and keeps exact figures in an expandable table.
+
+**Reading a prediction:** The 50.24% accuracy in the Results table belongs to the model trained through 2014/2015 and tested on 2015/2016. It is not a measured accuracy for the app's full-data matchup predictor; this database has no later season on which to test that version. A 47% win probability means a 47% estimated chance of that outcome, not 47% model accuracy. A draw and the other team's win may together be more likely. For teams absent from the final recorded season, their latest form is older still, and the league selected in the app is an assumption.
+
+From the project root in PowerShell, install the optional UI dependency and create the historical forecast archive once:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,ui]"
+.\.venv\Scripts\python.exe -m footballml.query build-forecasts
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+Open the local address printed by Streamlit. The SQLite database and generated forecast archive stay under `Data/` and are excluded from Git.
+
+## Future designs
+
+- **Refresh the data:** Add post-2016 results and verified pre-match information to support more relevant forecasts.
+- **Improve predictive accuracy:** Test stronger team-form and rating features against the current model, while tracking log loss and probability calibration as well as accuracy.
+- **Evaluate and explain:** Test on a new, unseen season and add team-form trends and clearer prediction explanations to the app.
