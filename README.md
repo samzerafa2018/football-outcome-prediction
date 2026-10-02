@@ -54,3 +54,19 @@ python -m venv .venv
 ```
 
 The final four commands run the baseline validation, logistic validation, full held-out test, and matched-subset bookmaker benchmark, respectively.
+
+## Explore historical matches
+
+The command-line interface uses exact team names and match IDs. It retrieves recorded scores and can show stored pre-match probabilities for 2015/2016 fixtures.
+
+```powershell
+.\.venv\Scripts\python.exe -m footballml.query teams "BSC Young Boys" "FC Basel" --season "2008/2009"
+.\.venv\Scripts\python.exe -m footballml.query build-forecasts
+.\.venv\Scripts\python.exe -m footballml.query forecast-teams "BSC Young Boys" "FC Basel"
+.\.venv\Scripts\python.exe -m footballml.query forecast 25979
+.\.venv\Scripts\python.exe -m footballml.query league-performance
+```
+
+`build-forecasts` fits the selected logistic model on seasons through 2014/2015 and saves 3,326 held-out predictions under `Data/`, which is excluded from Git. If two teams met more than once, select a match ID before viewing its forecast. These are historical 2015/2016 predictions, not forecasts for current matches.
+
+`league-performance` ranks leagues by the mean points per recorded match of their top quarter of teams, rounded up. In 2015/2016 Portugal ranks first on this measure at 2.112. This measures domestic points concentration; it cannot establish which league has the strongest teams.

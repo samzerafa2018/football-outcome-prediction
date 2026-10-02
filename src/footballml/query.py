@@ -6,6 +6,7 @@ from pathlib import Path
 from footballml.answers import answer_match, answer_team_ids, answer_teams
 from footballml.data import TEST_SEASON
 from footballml.lookup import find_matches, find_teams
+from footballml.performance import format_league_summaries, league_summaries
 from footballml.predictions import (
     DEFAULT_ARCHIVE,
     format_forecast,
@@ -52,6 +53,10 @@ def main() -> None:
     )
     forecast_teams.add_argument("first_team")
     forecast_teams.add_argument("second_team")
+    performance = commands.add_parser(
+        "league-performance", help="Compare top-quarter points per match"
+    )
+    performance.add_argument("--season", default=TEST_SEASON)
 
     for command in (teams, team_ids):
         command.add_argument("--season")
@@ -61,6 +66,10 @@ def main() -> None:
     if args.command == "build-forecasts":
         count = save_heldout_predictions(args.db, args.archive)
         print(f"Saved {count} held-out forecasts to {args.archive}")
+        return
+    if args.command == "league-performance":
+        summaries = league_summaries(args.db, args.season)
+        print(format_league_summaries(summaries, args.season))
         return
     if args.command == "forecast":
         _print_forecast(args.db, args.archive, args.match_id)
