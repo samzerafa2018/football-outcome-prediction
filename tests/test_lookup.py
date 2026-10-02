@@ -2,6 +2,7 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 
+from footballml.answers import answer_match, answer_team_ids, answer_teams
 from footballml.lookup import find_matches, find_teams, get_match
 
 
@@ -48,3 +49,16 @@ def test_duplicate_names_and_same_day_matches(tmp_path: Path) -> None:
         3,
         1,
     )
+
+    teams = answer_teams(database, "Mouscron", "Other FC")
+    assert teams.status == "clarify_team"
+    assert teams.team_options == ((1, 2), (3,))
+
+    fixtures = answer_team_ids(database, 1, 3, season="2015/2016")
+    assert fixtures.status == "clarify_match"
+    assert fixtures.match_options == (10, 11)
+    assert "result" not in fixtures.text
+
+    exact = answer_match(database, 11)
+    assert exact.status == "result"
+    assert exact.text.endswith("result 2–1")
