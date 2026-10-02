@@ -57,7 +57,7 @@ Goal difference improves log loss in all three folds. The gain is modest, so thi
 | Log loss | 1.0676 | 1.0040 | **0.9997** |
 | Three-class Brier | 0.6452 | 0.5998 | **0.5969** |
 
-These validation folds were used for model and feature selection, so their scores are not an independent final estimate. The 2015/2016 season remains reserved for final testing.
+These validation folds were used for model and feature selection, so their scores are not an independent final estimate. The 2015/2016 season was used for the final evaluation.
 ## Calibration check
 
 Across the three validation seasons, average predicted outcome rates were close to observed rates. Five equal-sized probability groups per outcome showed some underconfidence for high home- and away-win probabilities.
